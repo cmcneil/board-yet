@@ -1,0 +1,20 @@
+package org.convox.board;
+
+// A proto to hold all of one user's ratings on board game geek.
+// Next Id: 3
+message UserRatings {
+    // The user's name.
+    optional string user_id = 1;
+
+    // Next Id: 3
+    message GameRating {
+        // The name of the game.
+        optional string game_id = 1;
+
+        //The rating range from 1 to 10.
+        optional uint32 rating = 2;
+    }
+
+    // All the ratings from this user.
+    repeated GameRating game_ratings = 2;
+}
