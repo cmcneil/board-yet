@@ -24,11 +24,20 @@ class Item2Vec(object):
         # This variable must be filled upon reading in training set.
         self.total_item_counts = []
 
+        self.init_graphs()
+
     def init_graphs(self):
         # TODO(carson): Get variables representing batches and labels
-        batch_logits, neg_logits = self.build_training_graph(batch, labels)
+        self.batch = tf.placeholder(dtype=tf.int32, shape=[None, self.batch_size])
+        self.labels = tf.placeholder(dtype=tf.int32, shape=[None, self.batch_size])
+        batch_logits, neg_logits = self.build_training_graph(self.batch,
+                                                             self.labels)
         self.loss = self.loss_function(batch_logits, neg_logits)
+        tf.scalar_summary("NCE loss", self.loss)
         self.train_node = self.build_optimize_graph(self.loss)
+        
+        tf.initialize_all_variables().run()
+        self.saver = tf.train.Saver()
 
     def build_training_graph(self, batch, labels):
         """Takes in the graph nodes representing a training batch and
@@ -108,3 +117,10 @@ class Item2Vec(object):
         train = optimizer.minimize(loss, global_step=self.global_step,
                                    gate_gradients=optimizer.GATE_NONE)
         return train
+
+    def train_model(self):
+        for step in xrange(self.num_epochs):
+            # Get batches here.
+            _, loss_val = self.session.run([self.train_node, self.loss], 
+                                            feed_dict: {self.batch: batch,
+                                                        self.labels: labels})
